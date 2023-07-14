@@ -14,7 +14,6 @@ int main(void)
 	{
 		if (upperC == 101 || upperC == 113)
 		{
-			upperC++;
 			continue;
 		}
 		putchar(upperC);
