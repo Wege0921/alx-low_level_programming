@@ -9,8 +9,7 @@
 int main(void)
 {
 	int digit;
-	int alpha;
-
+	
 	for (digit = 48; digit <= 57; digit++)
 	{
 		putchar(digit);
