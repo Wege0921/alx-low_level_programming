@@ -1,11 +1,9 @@
 #include "main.h"
-
 /**
- * main - check the code.
+ * main - check the code
  *
- * return - always 0.
+ * Return: Always 0.
  */
-
 int main(void)
 {
 	_putchar('_');
