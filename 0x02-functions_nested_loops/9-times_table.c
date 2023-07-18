@@ -26,6 +26,10 @@ void times_table(void)
 			}
 			else
 			{
+				if (y != 0)
+				{
+					_putchar(' ');
+				}
 				_putchar(product + '0');
 			}
 		}
