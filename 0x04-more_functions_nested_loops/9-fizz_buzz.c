@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "main.h"
 
 /**
  * main - FizzBuzz program
@@ -28,7 +27,7 @@ int main(void)
 		{
 			printf("%d ", a);
 		}
-		if (a != 100)
+		if (a < 100)
 		{
 			printf(" ");
 		}
