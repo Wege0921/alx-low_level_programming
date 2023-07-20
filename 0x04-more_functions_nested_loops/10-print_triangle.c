@@ -1,8 +1,8 @@
 #include "main.h"
 
 /**
- * print_triangle - prints a triangle of given size
- * @size: The size of the triangle
+ * print_triangle - prints a triangle
+ * @size: size of the triangle
  */
 void print_triangle(int size)
 {
@@ -16,10 +16,12 @@ void print_triangle(int size)
 
 	for (i = 0; i < size; i++)
 	{
+		for (j = i; j < size - 1; j++)
+			_putchar(' ');
+
 		for (j = 0; j <= i; j++)
-		{
 			_putchar('#');
-		}
+
 		_putchar('\n');
 	}
 }
