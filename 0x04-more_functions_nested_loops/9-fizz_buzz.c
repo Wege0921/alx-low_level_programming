@@ -2,26 +2,26 @@
 #include <stdio.h>
 
 /**
- * main - Prints numbers from 1 to 100 with Fizz-Buzz conditions.
+ * main - FizzBuzz program
  *
- * Return: Always 0.
+ * Return: Always 0
  */
 int main(void)
 {
-	int i;
+    int i;
 
-	for (i = 1; i <= 100; i++)
-	{
-		if (i % 3 == 0 && i % 5 == 0)
-			printf("FizzBuzz ");
-		else if (i % 3 == 0)
-			printf("Fizz ");
-		else if (i % 5 == 0)
-			printf("Buzz ");
-		else
-			printf("%d ", i);
-	}
+    for (i = 1; i <= 100; i++)
+    {
+        if ((i % 3 == 0) && (i % 5 == 0))
+            printf("FizzBuzz ");
+        else if (i % 3 == 0)
+            printf("Fizz ");
+        else if (i % 5 == 0)
+            printf("Buzz ");
+        else
+            printf("%d ", i);
+    }
 
-	printf("\n");
-	return (0);
+    printf("\n");
+    return (0);
 }
