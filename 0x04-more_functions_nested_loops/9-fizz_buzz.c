@@ -27,10 +27,6 @@ int main(void)
 		{
 			printf("%d ", a);
 		}
-		if (a % 10 == 0)
-		{
-			printf("\n");
-		}
 	}
 
 	printf("\n");
