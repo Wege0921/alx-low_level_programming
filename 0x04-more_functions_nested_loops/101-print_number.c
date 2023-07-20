@@ -29,4 +29,5 @@ void print_number(int n)
 		n %= divisor;
 		divisor /= 10;
 	}
+	_putchar('\n');
 }
