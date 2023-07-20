@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "main.h"
-
 /**
  * main - FizzBuzz program
  *
@@ -8,26 +7,24 @@
  */
 int main(void)
 {
-	int a;
+	int i;
+	int print_space = 0;
 
-	for (a = 1; a <= 100; a++)
+	for (i = 1; i <= 100; i++)
 	{
-		if ((a % 3 == 0) && (a % 5 == 0))
-		{
-			printf("FizzBuzz ");
-		}
-		else if (a % 3 == 0)
-		{
-			printf("Fizz ");
-		}
-		else if (a % 5 == 0)
-		{
-			printf("Buzz ");
-		}
+		if (print_space)
+			printf("\t");
 		else
-		{
-			printf("%d ", a);
-		}
+			print_space = 1;
+
+		if (i % 3 == 0 && i % 5 == 0)
+			printf("FizzBuzz");
+		else if (i % 3 == 0)
+			printf("Fizz");
+		else if (i % 5 == 0)
+			printf("Buzz");
+		else
+			printf("%d", i);
 	}
 
 	printf("\n");
