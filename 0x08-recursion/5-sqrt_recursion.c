@@ -6,7 +6,7 @@
  * @n: The number to calculate the square root of.
  * @i: The current guess for the square root.
  *
- * Return: The square root of n, or -1 if n 
+ * Return: The square root of n, or -1 if n
  *	does not have a natural square root.
  */
 int sqrt_recursive(int n, int i);
