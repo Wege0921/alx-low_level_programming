@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "main.h"
+
 /**
  * _mul - Converts a string to an integer
  * @s: The string to convert
  *
- * Return: The converted integer, or 0 if no valid conversion could be performed
+ * Return: The converted integer, or 0
+ *	if no valid conversion could be performed
  */
 int _mul(char *s)
 {
@@ -30,5 +33,5 @@ int _mul(char *s)
 		i++;
 	}
 
-	return result * sign;
+	return (result * sign);
 }
