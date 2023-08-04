@@ -1,26 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 /**
- * main - Entry point of the program
- * @argc: The number of command-line arguments
- * @argv: An array of strings containing the arguments
+ * _mul - Converts a string to an integer
+ * @s: The string to convert
  *
- * Return: 0 if successful, 1 if arguments are missing
+ * Return: The converted integer, or 0 if no valid conversion could be performed
  */
-int main(int argc, char *argv[])
+int _mul(char *s)
 {
-	if (argc != 3)
+	int i = 0, sign = 1, result = 0;
+
+	/* Skip leading whitespace */
+	while (s[i] == ' ' || (s[i] >= 9 && s[i] <= 13))
+		i++;
+
+	/* Handle sign */
+	if (s[i] == '-')
 	{
-		printf("Error\n");
-		return (1);
+		sign = -1;
+		i++;
+	}
+	else if (s[i] == '+')
+		i++;
+
+	/* Convert digits */
+	while (s[i] >= '0' && s[i] <= '9')
+	{
+		result = result * 10 + (s[i] - '0');
+		i++;
 	}
 
-	int num1 = atoi(argv[1]);
-	int num2 = atoi(argv[2]);
-	int result = num1 * num2;
-
-	printf("%d\n", result);
-
-	return (0);
+	return result * sign;
 }
