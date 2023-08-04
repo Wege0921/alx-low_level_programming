@@ -16,11 +16,11 @@ int is_positive_number(char *s)
 	while (s[i] != '\0')
 	{
 		if (!isdigit(s[i]))
-			return 0;
+			return (0);
 		i++;
 	}
 
-	return 1;
+	return (1);
 }
 
 /**
@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	if (argc == 1)
 	{
 		printf("0\n");
-		return 0;
+		return (0);
 	}
 
 	for (i = 1; i < argc; i++)
@@ -49,11 +49,11 @@ int main(int argc, char *argv[])
 		else
 		{
 			printf("Error\n");
-			return 1;
+			return (1);
 		}
 	}
 
 	printf("%d\n", sum);
-	return 0;
+	return (0);
 }
 
