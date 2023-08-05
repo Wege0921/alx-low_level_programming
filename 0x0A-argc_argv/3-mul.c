@@ -28,6 +28,7 @@ int string_to_int(char *str)
 		if (str[i] >= '0' && str[i] <= '9')
 		{
 			int digit = str[i] - '0';
+
 			if (sign % 2)
 				digit = -digit;
 			num = num * 10 + digit;
