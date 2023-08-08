@@ -1,5 +1,6 @@
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+#include "main.h"
 
 /**
  * count_words - Counts the number of words in a string.
@@ -23,7 +24,6 @@ int count_words(char *str)
 			in_word = 0;
 		}
 	}
-
 	return (words);
 }
 
@@ -35,10 +35,10 @@ int count_words(char *str)
  */
 char **strtow(char *str)
 {
-	int i, j, k = 0, words, word_len;
+	int i, j, k, words, len, start;
 	char **result;
 
-	if (str == NULL || *str == '\0')
+	if (str == NULL || str[0] == '\0')
 		return (NULL);
 
 	words = count_words(str);
@@ -46,32 +46,26 @@ char **strtow(char *str)
 	if (result == NULL)
 		return (NULL);
 
-	for (i = 0; i < words; i++)
+	for (i = 0, j = 0; i < words; i++)
 	{
-		while (*str == ' ')
-			str++;
-
-		word_len = 0;
-		while (str[word_len] != ' ' && str[word_len] != '\0')
-			word_len++;
-
-		result[i] = malloc(sizeof(char) * (word_len + 1));
+		while (str[j] == ' ')
+			j++;
+		start = j;
+		while (str[j] != ' ' && str[j] != '\0')
+			j++;
+		len = j - start;
+		result[i] = malloc(sizeof(char) * (len + 1));
 		if (result[i] == NULL)
 		{
-			for (j = 0; j < i; j++)
-				free(result[j]);
+			for (k = 0; k < i; k++)
+				free(result[k]);
 			free(result);
 			return (NULL);
 		}
-
-		for (j = 0; j < word_len; j++)
-			result[i][j] = str[k++];
-		result[i][j] = '\0';
-
-		str += word_len;
+		for (k = 0; k < len; k++, start++)
+			result[i][k] = str[start];
+		result[i][k] = '\0';
 	}
-
-	result[words] = NULL;
+	result[i] = NULL;
 	return (result);
 }
-
