@@ -13,10 +13,10 @@ int is_valid_number(char *str)
 	while (*str)
 	{
 		if (*str < '0' || *str > '9')
-			return 0;
+			return (0);
 		str++;
 	}
-	return 1;
+	return (1);
 }
 
 /**
@@ -33,11 +33,12 @@ int get_string_length(char *str)
 	{
 		length++;
 	}
-	return length;
+	return (length);
 }
 
 /**
- * print_error_and_exit - prints an error message and exits the program with status 98
+ * print_error_and_exit - prints an error message
+ *	and exits the program with status 98
  */
 void print_error_and_exit(void)
 {
