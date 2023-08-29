@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stddef.h>
 #include "lists.h"
 /**
@@ -13,7 +11,7 @@ size_t print_listint(const listint_t *h)
 {
 	size_t count = 0; /* Initialize the count of nodes */
 
-	while (h != NULL) /* Traverse the linked list */
+	while (h) /* Traverse the linked list */
 	{
 		printf("%d\n", h->n); /* Print the value of the current node */
 		h = h->next; /* Move to the next node */
