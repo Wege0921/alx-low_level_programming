@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 /**
  * create_buffer - Allocates memory for a buffer.
@@ -90,11 +88,9 @@ int main(int argc, char *argv[])
 		fd_to = open(argv[2], O_WRONLY | O_APPEND);
 
 	} while (bytes_read > 0);
-
 	free(buffer);
 	close_fd(fd_from);
 	close_fd(fd_to);
-
 	return (0);
 }
 
