@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <fcnt1.h>
 #include <elf.h>
 #include <stdlib.h>
-
+#include <fcntl.h>
 
 void checkElfFile(unsigned char *eIdent);
 void printElfMagic(unsigned char *eIdent);
@@ -25,7 +24,9 @@ void closeElfFile(int elfFd);
 
 void checkElfFile(unsigned char *eIdent)
 {
-	for (int index = 0; index < 4; index++)
+	int index;
+
+	for (index = 0; index < 4; index++)
 	{
 		if (eIdent[index] != 127 &&
 			eIdent[index] != 'E' &&
@@ -46,8 +47,10 @@ void checkElfFile(unsigned char *eIdent)
 
 void printElfMagic(unsigned char *eIdent)
 {
+	int index;
+
 	printf(" Magic: ");
-	for (int index = 0; index < EI_NIDENT; index++)
+	for (index = 0; index < EI_NIDENT; index++)
 	{
 		printf("%02x", eIdent[index]);
 		if (index == EI_NIDENT - 1)
