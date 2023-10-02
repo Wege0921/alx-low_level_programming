@@ -1,151 +1,212 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <elf.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+void validateElfFile(unsigned char *magicNumbers);
+void printElfMagicNumbers(unsigned char *magicNumbers);
+void printElfClass(unsigned char *magicNumbers);
+void printElfData(unsigned char *magicNumbers);
+void printElfVersion(unsigned char *magicNumbers);
+void printElfOsAbi(unsigned char *magicNumbers);
+void printElfAbiVersion(unsigned char *magicNumbers);
+void printElfType(unsigned int fileType, unsigned char *magicNumbers);
+void printElfEntryPoint(unsigned long int entryPoint, unsigned char *magicNumbers);
+void closeElfFile(int fileDescriptor);
 
 /**
- * main - Entry point.
- * @argc: The number of command-line arguments.
- * @argv: An array of command-line argument strings.
- * 
- * Return: 0 on success, 98 on error.
+ * validateElfFile - Checks if a file is an ELF file.
+ * @magicNumbers: A pointer to an array containing the ELF magic numbers.
+ *
+ * Description: If the file is not an ELF file - exit with code 98.
  */
-int main(int argc, char *argv[])
+void validateElfFile(unsigned char *magicNumbers)
 {
-	int fd;
-	ssize_t bytes_read;
-	unsigned char buffer[32];
+    int index;
 
-	if (argc != 2)
-	{
-		dprintf(2, "Usage: %s elf_filename\n", argv[0]);
-		return (98);
-	}
-
-	fd = open(argv[1], O_RDONLY);
-	if (fd == -1)
-	{
-		dprintf(2, "Error: Can't open file %s\n", argv[1]);
-		return (98);
-	}
-
-	bytes_read = read(fd, buffer, 32);
-	if (bytes_read == -1)
-	{
-		dprintf(2, "Error: Can't read from file %s\n", argv[1]);
-		close(fd);
-		return (98);
-	}
-
-	if (bytes_read < 32)
-	{
-		dprintf(2, "Error: Not an ELF file\n");
-		close(fd);
-		return (98);
-	}
-
-	printf("ELF Header:\n");
-	printf("\tMagic:\t\t");
-	for (int i = 0; i < 16; i++)
-		printf("%02x ", buffer[i]);
-	printf("\n");
-
-	printf("\tClass:\t\t\t\tELF%d\n", buffer[4] == 1 ? 32 : 64);
-	printf("\tData:\t\t\t\t2's complement, %s endian\n", buffer[5] == 1 ? "little" : "big");
-	printf("\tVersion:\t\t\t%d (current)\n", buffer[6]);
-	printf("\tOS/ABI:\t\t\t\tUNIX - ");
-	switch (buffer[7])
-	{
-	case 0:
-		printf("System V\n");
-		break;
-	case 1:
-		printf("HP-UX\n");
-		break;
-	case 2:
-		printf("NetBSD\n");
-		break;
-	case 3:
-		printf("Linux\n");
-		break;
-	case 4:
-		printf("GNU Hurd\n");
-		break;
-	case 6:
-		printf("Solaris\n");
-		break;
-	case 7:
-		printf("AIX\n");
-		break;
-	case 8:
-		printf("IRIX\n");
-		break;
-	case 9:
-		printf("FreeBSD\n");
-		break;
-	case 10:
-		printf("Tru64\n");
-		break;
-	case 11:
-		printf("Novell Modesto\n");
-		break;
-	case 12:
-		printf("OpenBSD\n");
-		break;
-	case 13:
-		printf("OpenVMS\n");
-		break;
-	case 14:
-		printf("NonStop Kernel\n");
-		break;
-	case 15:
-		printf("AROS\n");
-		break;
-	case 16:
-		printf("Fenix OS\n");
-		break;
-	case 17:
-		printf("CloudABI\n");
-		break;
-	default:
-		printf("<unknown: %d>\n", buffer[7]);
-	}
-	printf("\tABI Version:\t\t\t%d\n", buffer[8]);
-	printf("\tType:\t\t\t\t");
-	switch (*(unsigned short *)(buffer + 16))
-	{
-	case 0:
-		printf("NONE (No file type)\n");
-		break;
-	case 1:
-		printf("REL (Relocatable file)\n");
-		break;
-	case 2:
-		printf("EXEC (Executable file)\n");
-		break;
-	case 3:
-		printf("DYN (Shared object file)\n");
-		break;
-	case 4:
-		printf("CORE (Core file)\n");
-		break;
-	default:
-		printf("<unknown: %hu>\n", *(unsigned short *)(buffer + 16));
-	}
-	printf("\tEntry point address:\t0x");
-	if (buffer[4] == 1)
-	{
-		for (int i = 0; i < 4; i++)
-			printf("%02x", buffer[24 + i]);
-	}
-	else
-	{
-		for (int i = 0; i < 8; i++)
-			printf("%02x", buffer[24 + i]);
-	}
-	printf("\n");
-
-	close(fd);
-	return (0);
+    for (index = 0; index < 4; index++)
+    {
+        if (magicNumbers[index] != 127 &&
+            magicNumbers[index] != 'E' &&
+            magicNumbers[index] != 'L' &&
+            magicNumbers[index] != 'F')
+        {
+            dprintf(STDERR_FILENO, "Error: Not an ELF file\n");
+            exit(98);
+        }
+    }
 }
 
+/**
+ * printElfMagicNumbers - Prints the magic numbers of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF magic numbers.
+ *
+ * Description: Magic numbers are separated by spaces.
+ */
+void printElfMagicNumbers(unsigned char *magicNumbers)
+{
+    int index;
+
+    printf(" Magic: ");
+
+    for (index = 0; index < EI_NIDENT; index++)
+    {
+        printf("%02x", magicNumbers[index]);
+
+        if (index == EI_NIDENT - 1)
+            printf("\n");
+        else
+            printf(" ");
+    }
+}
+
+/**
+ * printElfClass - Prints the class of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF class.
+ */
+void printElfClass(unsigned char *magicNumbers)
+{
+    printf(" Class: ");
+
+    switch (magicNumbers[EI_CLASS])
+    {
+    case ELFCLASSNONE:
+        printf("none\n");
+        break;
+    case ELFCLASS32:
+        printf("ELF32\n");
+        break;
+    case ELFCLASS64:
+        printf("ELF64\n");
+        break;
+    default:
+        printf("<unknown: %x>\n", magicNumbers[EI_CLASS]);
+    }
+}
+
+/**
+ * printElfData - Prints the data of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF class.
+ */
+void printElfData(unsigned char *magicNumbers)
+{
+    printf(" Data: ");
+
+    switch (magicNumbers[EI_DATA])
+    {
+    case ELFDATANONE:
+        printf("none\n");
+        break;
+    case ELFDATA2LSB:
+        printf("2's complement, little endian\n");
+        break;
+    case ELFDATA2MSB:
+        printf("2's complement, big endian\n");
+        break;
+    default:
+        printf("<unknown: %x>\n", magicNumbers[EI_CLASS]);
+    }
+}
+
+/**
+ * printElfVersion - Prints the version of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF version.
+ */
+void printElfVersion(unsigned char *magicNumbers)
+{
+    printf(" Version: %d",
+           magicNumbers[EI_VERSION]);
+
+    switch (magicNumbers[EI_VERSION])
+    {
+    case EV_CURRENT:
+        printf(" (current)\n");
+        break;
+    default:
+        printf("\n");
+        break;
+    }
+}
+
+/**
+ * printElfOsAbi - Prints the OS/ABI of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF version.
+ */
+void printElfOsAbi(unsigned char *magicNumbers)
+{
+    printf(" OS/ABI: ");
+
+    switch (magicNumbers[EI_OSABI])
+    {
+    case ELFOSABI_NONE:
+        printf("UNIX - System V\n");
+        break;
+    case ELFOSABI_HPUX:
+        printf("UNIX - HP-UX\n");
+        break;
+    case ELFOSABI_NETBSD:
+        printf("UNIX - NetBSD\n");
+        break;
+    case ELFOSABI_LINUX:
+        printf("UNIX - Linux\n");
+        break;
+    case ELFOSABI_SOLARIS:
+        printf("UNIX - Solaris\n");
+        break;
+    case ELFOSABI_IRIX:
+        printf("UNIX - IRIX\n");
+        break;
+    case ELFOSABI_FREEBSD:
+        printf("UNIX - FreeBSD\n");
+        break;
+    case ELFOSABI_TRU64:
+        printf("UNIX - TRU64\n");
+        break;
+    case ELFOSABI_ARM:
+        printf("ARM\n");
+        break;
+    case ELFOSABI_STANDALONE:
+        printf("Standalone App\n");
+        break;
+    default:
+        printf("<unknown: %x>\n", magicNumbers[EI_OSABI]);
+    }
+}
+
+/**
+ * printElfAbiVersion - Prints the ABI version of an ELF header.
+ * @magicNumbers: A pointer to an array containing the ELF ABI version.
+ */
+void printElfAbiVersion(unsigned char *magicNumbers)
+{
+    printf(" ABI Version: %d\n",
+           magicNumbers[EI_ABIVERSION]);
+}
+
+/**
+ * printElfType - Prints the type of an ELF header.
+ * @fileType: The ELF type.
+ * @magicNumbers: A pointer to an array containing the ELF class.
+ */
+void printElfType(unsigned int fileType, unsigned char *magicNumbers)
+{
+    if (magicNumbers[EI_DATA] == ELFDATA2MSB)
+        fileType >>= 8;
+
+    printf(" Type: ");
+
+    switch (fileType)
+    {
+    case ET_NONE:
+        printf("NONE (None)\n");
+        break;
+    case ET_REL:
+        printf("REL (Relocatable file)\n");
+        break;
+    case ET_EXEC:
+        printf("EXEC (Executable file)\
+	}
+}
