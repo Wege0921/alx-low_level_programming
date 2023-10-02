@@ -3,90 +3,105 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 1024
 
 /**
- * handle_error - Prints an error message to the standard
- *	error and exits the program.
- * @message: The error message to be printed.
- * @exit_code: The exit code to be used when terminating the program.
+ * createBuffer - Create a character buffer for file operations.
+ * @targetFile: The name of the target file for error messages.
  *
- * This function prints the given error message to
- *	the standard error (file descriptor 2)
- * and then exits the program with the specified exit code.
+ * Return: A pointer to the newly allocated character buffer.
+ *
+ * This function allocates memory for a character buffer with a size of 1024
+ * bytes and checks for successful allocation. If allocation fails, it prints
+ * an error message to the standard error and exits with a status code of 99.
+ *
+ * Note: The caller is responsible for freeing the memory allocated by this
+ * function when it's no longer needed.
  */
-
-void handle_error(const char *message, int exit_code)
+char *createBuffer(char *targetFile)
 {
-	dprintf(2, "%s\n", message);
-	exit(exit_code);
+	char *buffer;
+
+	buffer = malloc(sizeof(char) * 1024);
+
+	if (buffer == NULL)
+	{
+		dprintf(STDERR_FILENO, "Error: Can't write to %s\n", targetFile);
+		exit(99);
+	}
+
+	return (buffer);
 }
 
+
 /**
- * copy_file - Copies the contents of one file to another.
- * @source: The path to the source file to be copied.
- * @destination: The path to the destination file where
- *	the content will be copied.
- *
- * This function opens the source and destination files,
- *	reads the content from the source file, and writes it
- *	to the destination file in chunks. It uses a buffer
- * to efficiently copy the data.
+ * closeFile - Closes file descriptors.
+ * @fileDescriptor: The file descriptor to be closed.
  */
 
-void copy_file(const char *source, const char *destination)
+void closeFile(int fileDescriptor)
 {
-	int fd_from, fd_to;
-	ssize_t bytes_read, bytes_written;
-	char buffer[BUFFER_SIZE];
+	int result;
 
-	fd_from = open(source, O_RDONLY);
-	if (fd_from == -1)
+	result = close(fileDescriptor);
+	if (result == -1)
 	{
-		handle_error("Error: Can't read from source file", 98);
+		dprintf(STDERR_FILENO, "Error: Can't close fd %d\n", fileDescriptor);
+		exit(100);
+	}
+}
+
+
+/**
+ * main - Copies the contents of a file to another file.
+ * @argumentCount: The number of arguments supplied to the program.
+ * @arguments: An array of pointers to the arguments.
+ *
+ * Return: 0 on success.
+ */
+
+
+int main(int argumentCount, char *arguments[])
+{
+	int sourceFileDescriptor, targetFileDescriptor, bytesRead, bytesWritten;
+	char *buffer;
+
+	if (argumentCount != 3)
+	{
+		dprintf(STDERR_FILENO, "Usage: cp file_from file_to\n");
+		exit(97);
 	}
 
-	fd_to = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-	if (fd_to == -1)
-	{
-		handle_error("Error: Can't write to destination file", 99);
-	}
+	buffer = createBuffer(arguments[2]);
+	sourceFileDescriptor = open(arguments[1], O_RDONLY);
+	bytesRead = read(sourceFileDescriptor, buffer, 1024);
+	targetFileDescriptor = open(arguments[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
 
-	while ((bytes_read = read(fd_from, buffer, BUFFER_SIZE)) > 0)
-	{
-		bytes_written = write(fd_to, buffer, bytes_read);
-		if (bytes_written == -1)
+	do {
+		if (sourceFileDescriptor == -1 || bytesRead == -1)
 		{
-			handle_error("Error: Can't write to destination file", 99);
+			dprintf(STDERR_FILENO, "Error: Can't read from file %s\n", arguments[1]);
+			free(buffer);
+			exit(98);
 		}
-	}
 
-	if (bytes_read == -1)
-	{
-		handle_error("Error: Can't read from source file", 98);
-	}
+		bytesWritten = write(targetFileDescriptor, buffer, bytesRead);
+		if (targetFileDescriptor == -1 || bytesWritten == -1)
+		{
+			dprintf(STDERR_FILENO, "Error: Can't write to %s\n", arguments[2]);
+			free(buffer);
+			exit(99);
+		}
 
-	close(fd_from);
-	close(fd_to);
-}
+		bytesRead = read(sourceFileDescriptor, buffer, 1024);
+		targetFileDescriptor = open(arguments[2], O_WRONLY | O_APPEND);
 
-/**
- * main - The main entry point of the program.
- * @argc: The number of command-line arguments.
- * @argv: An array of strings representing the command-line arguments.
- *
- * Return: 0 on success, and various exit codes on failure.
- */
+	} while (bytesRead > 0);
 
-int main(int argc, char *argv[])
-{
-	if (argc != 3)
-	{
-		handle_error("Usage: cp file_from file_to", 97);
-	}
-
-	copy_file(argv[1], argv[2]);
-
+	free(buffer);
+	closeFile(sourceFileDescriptor);
+	closeFile(targetFileDescriptor);
 	return (0);
 }
+
+
 

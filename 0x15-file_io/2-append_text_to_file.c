@@ -11,33 +11,29 @@
  *
  * Return: 1 on success, -1 on failure.
  */
+
+
 int append_text_to_file(const char *filename, char *text_content)
 {
-	int fd = open(filename, O_WRONLY | O_APPEND);
-	ssize_t bytes_written = 0;
-	
+	int file_descriptor, bytes_written, content_length = 0;
+
 	if (filename == NULL)
-                return (-1);
-	if (fd == -1)
 		return (-1);
 
 	if (text_content != NULL)
 	{
-		ssize_t len = 0;
-
-		while (text_content[len] != '\0')
-			len++;
-
-		bytes_written = write(fd, text_content, len);
-
-		if (bytes_written == -1)
-		{
-			close(fd);
-			return (-1);
-		}
+		for (content_length = 0; text_content[content_length];)
+			content_length++;
 	}
 
-	close(fd);
+	file_descriptor = open(filename, O_WRONLY | O_APPEND);
+	bytes_written = write(file_descriptor, text_content, content_length);
+
+	if (file_descriptor == -1 || bytes_written == -1)
+		return (-1);
+
+	close(file_descriptor);
+
 	return (1);
 }
 

@@ -11,37 +11,28 @@
  *
  * Return: 1 on success, -1 on failure
  */
+
 int create_file(const char *filename, char *text_content)
 {
-	ssize_t bytes_written;
-	int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	
+	int file_descriptor, bytes_written, content_length = 0;
+
 	if (filename == NULL)
-                return (-1);
-	if (fd == -1)
 		return (-1);
 
 	if (text_content != NULL)
 	{
-		ssize_t len = 0;
-
-		while (text_content[len] != '\0')
-			len++;
-
-		bytes_written = write(fd, text_content, len);
-
-		if (bytes_written == -1)
-		{
-			close(fd);
-			return (-1);
-		}
-	}
-	else
-	{
-		bytes_written = 0;
+		for (content_length = 0; text_content[content_length];)
+			content_length++;
 	}
 
-	close(fd);
+	file_descriptor = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0600);
+	bytes_written = write(file_descriptor, text_content, content_length);
+
+	if (file_descriptor == -1 || bytes_written == -1)
+		return (-1);
+
+	close(file_descriptor);
+
 	return (1);
 }
 
